@@ -1,0 +1,27 @@
+<%@page import="org.apache.commons.beanutils.BeanUtils"%>
+<%@ page language="java" contentType="text/html; charset=utf-8"
+    pageEncoding="UTF-8"%>
+<%@ page import="com.project.dao.#Dao"%>
+<%@ page import="com.project.pojo.#"%>
+<%@ page import="java.util.List"%>
+<%@ page import="org.apache.commons.beanutils.BeanUtils"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<%
+		request.setCharacterEncoding("UTF-8");
+		# p = new #();
+		List<String> listFields = #Dao.getFiledsName(new #());
+		for(String s:listFields){
+			String value = request.getParameter(s);
+			BeanUtils.setProperty(p, s, value);
+		}
+		#Dao.insert(p);
+		response.sendRedirect("list.jsp");
+	%>
+</body>
+</html>

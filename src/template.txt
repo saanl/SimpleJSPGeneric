@@ -1,0 +1,222 @@
+package com.project.dao;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.beanutils.BeanUtils;
+import com.mysql.jdbc.Connection;
+import com.project.pojo.#;
+
+public class #Dao {
+	
+	private static Connection conn = MysqlConnection.getConnection("@");
+	
+	public static List<String> getFiledsName(Object obj) {
+		Field[] fs =obj.getClass().getDeclaredFields();
+		List<String> list = new ArrayList<>();
+		for(Field f:fs ) {
+			list.add(f.getName());
+		}
+		return list;
+	}
+	
+	//传入一个Map对象，key为pojo对象的属性，value是你指定的值，采用模糊查询
+		public static List<#> queryByConditionLike(Map<String,String> map) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("select * from # where ");
+			for(String set :map.keySet()) {
+				sb.append(set+" like "+ "'%"+map.get(set)+"%'");
+				sb.append(" and ");
+			}
+				sb.append("true");
+				System.out.println(sb.toString());
+			List<#> plist = new ArrayList<>();/*  */
+			try {
+				Statement st = conn.createStatement();
+				ResultSet re = st.executeQuery(sb.toString());	
+				while(re.next()) {			
+					# p =new #();		/*  */
+					try {
+						List<String> list = getFiledsName(p);
+						for(String s:list) {
+							BeanUtils.setProperty(p, s, re.getString(s));
+						}
+						plist.add(p);
+					} catch (IllegalAccessException | InvocationTargetException e) {
+						e.printStackTrace();
+					}
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			//System.out.println(plist);
+			return plist;
+		}
+	
+	//传入一个Map对象，key为pojo对象的属性，value是你指定的值，采用等值查询
+	public static List<#> queryByConditionEquals(Map<String,String> map) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select * from # where ");
+		for(String set :map.keySet()) {
+			sb.append(set+" = "+ "'"+map.get(set)+"'");
+			sb.append(" and ");
+		}
+			sb.append("true");
+			System.out.println(sb.toString());
+		List<#> plist = new ArrayList<>();/*  */
+		try {
+			Statement st = conn.createStatement();
+			ResultSet re = st.executeQuery(sb.toString());	
+			while(re.next()) {			
+				# p =new #();		/*  */
+				try {
+					List<String> list = getFiledsName(p);
+					for(String s:list) {
+						BeanUtils.setProperty(p, s, re.getString(s));
+					}
+					plist.add(p);
+				} catch (IllegalAccessException | InvocationTargetException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		//System.out.println(plist);
+		return plist;
+	}
+	
+	
+	public static List<#> queryAll() {
+		String sql = "select * from #";
+		List<#> plist = new ArrayList<>();
+		try {
+			Statement st = conn.createStatement();
+			ResultSet re = st.executeQuery(sql);	
+			while(re.next()) {			
+				# p =new #();
+				try {
+					List<String> list = getFiledsName(p);
+					for(String s:list) {
+						BeanUtils.setProperty(p, s, re.getString(s));
+					}
+					plist.add(p);
+					
+				} catch (IllegalAccessException | InvocationTargetException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		System.out.println(plist);
+		return plist;
+	}
+	
+	//插入数据，只要一个对应的Java对象
+	public static void insert(# p) {
+		List<String> list = getFiledsName(p);
+		StringBuilder sb = new StringBuilder();
+		sb.append("insert into # (");
+		for(String s:list) {
+			sb.append(s);
+			if(list.get(list.size()-1).equals(s)) {
+				sb.append(" ");
+			}else {
+				sb.append(", ");
+			}
+		}
+		sb.append(") values(");
+		for(String s:list) {
+			try {
+				sb.append(" '"+BeanUtils.getProperty(p, s)+"' ");
+				if(list.get(list.size()-1).equals(s)) {
+					sb.append("");
+				}else {
+					sb.append(", ");
+				}
+			} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+				e.printStackTrace();
+			}
+		}
+		sb.append(")");
+		System.out.println(sb.toString());
+		try {
+			Statement st = conn.createStatement();
+			int i = st.executeUpdate(sb.toString());
+			if(i>0) {
+				System.out.println("插入成功");
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//更新数据，但是要传入主键名称就是Java对象的属性
+	public static void update(# p,String primary) {
+		
+		List<String> list = getFiledsName(p);
+		StringBuilder sb = new StringBuilder();
+		StringBuilder sb1 = new StringBuilder();
+		sb.append("UPDATE # SET ");
+		for(String s:list) {
+			if(s.equals(primary)) {
+					sb1.append("where "+s+"=");
+				try {
+					sb1.append("'"+BeanUtils.getProperty(p, s)+"'");
+				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}else {
+				sb.append(s + "=" );
+				try {
+					sb.append("'"+BeanUtils.getProperty(p, s)+"'");
+				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if(list.get(list.size()-1).equals(s)) {
+					sb.append(" ");
+				}else {
+					sb.append(", ");
+				}
+			}
+		}
+		sb.append(sb1);
+		System.out.println(sb.toString());
+		try {
+			Statement st = conn.createStatement();
+			int i = st.executeUpdate(sb.toString());
+			if(i>0) {
+				System.out.println("更新成功");
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void delete(String id) {
+		String sql = "DELETE FROM # WHERE id = "+id;
+		
+		try {
+			Statement st = conn.createStatement();
+			int i = st.executeUpdate(sql);
+			if(i>0) {
+				System.out.println("删除成功");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+}

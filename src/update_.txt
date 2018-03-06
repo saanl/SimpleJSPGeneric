@@ -1,0 +1,56 @@
+<%@page import="org.apache.commons.beanutils.BeanUtils"%>
+<%@ page language="java" contentType="text/html; charset=utf-8"
+    pageEncoding="UTF-8"%>
+<%@ page import="com.project.dao.#Dao"%>
+<%@ page import="com.project.pojo.#"%>
+<%@ page import="java.util.List"%>
+<%@ page import="java.util.HashMap"%>
+<%@ page import="java.util.Map"%>
+<%@page import="java.util.ArrayList"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+		<!-- 初始化数据 -->
+		<%
+			List<String> title = new ArrayList<String>();
+			$$
+			request.setCharacterEncoding("UTF-8");
+			String id = request.getParameter("id");
+			List<String> listField = #Dao.getFiledsName(new #());
+			Map<String,String> map=new HashMap<String,String>();
+			map.put("id", id);
+			# p = #Dao.queryByConditionEquals(map).get(0);
+		%>
+
+	<form action="update.jsp" method="post">
+	<table>
+
+		<tr>
+			<td colspan="2">更新</td>
+		</tr>
+		<%
+			for(int i=0;i<listField.size();i++){%>
+				<tr>
+					<td><%=title.get(i)%></td>
+					<td><input type="text" name="<%=listField.get(i)%>" value="<%= BeanUtils.getProperty(p, listField.get(i))%>"></td>
+				</tr>
+			<%}
+		%>
+	
+		<tr>
+			<td colspan="2"><input type="submit" value="更新"></td>
+		</tr>
+		
+	</table>
+
+
+</form>
+
+</body>
+</html>
